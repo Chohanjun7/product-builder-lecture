@@ -1,1 +1,79 @@
-/* Add styles here */
+
+:root {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --primary-color: #4caf50;
+    --secondary-color: #ff9800;
+    --ball-color: #333;
+    --ball-text-color: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0);
+    background-size: 20px 20px;
+}
+
+.container {
+    text-align: center;
+    padding: 2rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+    margin-bottom: 2rem;
+}
+
+.lotto-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+#generate-btn {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--primary-color);
+}
+
+#generate-btn:hover {
+    background-color: var(--secondary-color);
+    box-shadow: 0 0 20px var(--secondary-color), 0 0 30px var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .lotto-numbers {
+        gap: 0.5rem;
+    }
+
+    #generate-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}
