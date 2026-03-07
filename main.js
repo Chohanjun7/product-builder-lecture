@@ -105,13 +105,28 @@ function renderResults(predictions) {
     resultContainer.style.display = 'block';
     labelContainerDiv.innerHTML = '';
 
-    const topResult = predictions[0];
+    // Label mapping (Class 1 -> 강아지, Class 2 -> 고양이)
+    const labelMapping = {
+        "Class 1": "강아지",
+        "Class 2": "고양이",
+        "클래스 1": "강아지",
+        "클래스 2": "고양이",
+        "클래스1": "강아지",
+        "클래스2": "고양이"
+    };
+
+    // Apply mapping to predictions
+    const mappedPredictions = predictions.map(p => ({
+        ...p,
+        className: labelMapping[p.className] || p.className
+    }));
+
+    const topResult = mappedPredictions[0];
     let message = "";
     
-    // Custom messages based on top result (assuming labels like "강아지", "고양이")
-    if (topResult.className.includes("강아지") || topResult.className.toLowerCase().includes("dog")) {
+    if (topResult.className.includes("강아지")) {
         message = "당신은 귀여운 강아지상! 🐶";
-    } else if (topResult.className.includes("고양이") || topResult.className.toLowerCase().includes("cat")) {
+    } else if (topResult.className.includes("고양이")) {
         message = "당신은 도도한 고양이상! 🐱";
     } else {
         message = `당신은 ${topResult.className}상!`;
@@ -119,7 +134,7 @@ function renderResults(predictions) {
     
     resultMessage.innerText = message;
 
-    predictions.forEach(p => {
+    mappedPredictions.forEach(p => {
         const prob = (p.probability * 100).toFixed(1);
         const resultBar = `
             <div class="result-bar-container">
