@@ -1,23 +1,19 @@
-// Teachable Machine Model URL
+// --- Global State & Config ---
 const URL = "https://teachablemachine.withgoogle.com/models/tM5NC3zbJ/";
+let model, maxPredictions;
 
-let model, labelContainer, maxPredictions;
+// --- DOM Elements ---
+const lottoView = document.getElementById('lotto-view');
+const animalView = document.getElementById('animal-view');
+const navBtn = document.getElementById('nav-btn');
+const backBtn = document.getElementById('back-to-lotto');
+const themeBtn = document.getElementById('theme-btn');
 
-// Load the image model
-async function init() {
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
+// Lotto Elements
+const generateBtn = document.getElementById('generate-btn');
+const lottoNumbersContainer = document.getElementById('lotto-numbers');
 
-    try {
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
-        console.log("Model loaded successfully");
-    } catch (e) {
-        console.error("Failed to load model", e);
-    }
-}
-
-// DOM Elements
+// Animal Test Elements
 const imageInput = document.getElementById('image-input');
 const uploadBox = document.getElementById('upload-box');
 const previewContainer = document.getElementById('preview-container');
@@ -28,75 +24,107 @@ const resultContainer = document.getElementById('result-container');
 const labelContainerDiv = document.getElementById('label-container');
 const resultMessage = document.getElementById('result-message');
 
-// Event Listeners
+// --- Navigation & Theme ---
+navBtn.addEventListener('click', () => {
+    lottoView.style.display = 'none';
+    animalView.style.display = 'block';
+    navBtn.style.display = 'none';
+});
+
+backBtn.addEventListener('click', () => {
+    animalView.style.display = 'none';
+    lottoView.style.display = 'block';
+    navBtn.style.display = 'block';
+});
+
+let currentTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', currentTheme);
+updateThemeButton();
+
+themeBtn.addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    localStorage.setItem('theme', currentTheme);
+    updateThemeButton();
+});
+
+function updateThemeButton() {
+    themeBtn.textContent = currentTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+
+// --- Lotto Logic ---
+function generateLottoNumbers() {
+    lottoNumbersContainer.innerHTML = '';
+    const numbers = new Set();
+    while (numbers.size < 6) {
+        numbers.add(Math.floor(Math.random() * 45) + 1);
+    }
+    const sortedNumbers = Array.from(numbers).sort((a, b) => a - b);
+
+    sortedNumbers.forEach((num, i) => {
+        setTimeout(() => {
+            const ball = document.createElement('div');
+            ball.className = 'ball';
+            ball.style.cssText = `
+                width: 50px; height: 50px; border-radius: 50%; display: inline-flex;
+                justify-content: center; align-items: center; margin: 5px;
+                font-weight: bold; color: white; background: ${getBallColor(num)};
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            `;
+            ball.innerText = num;
+            lottoNumbersContainer.appendChild(ball);
+        }, i * 150);
+    });
+}
+
+function getBallColor(n) {
+    if (n <= 10) return '#f44336';
+    if (n <= 20) return '#ff9800';
+    if (n <= 30) return '#ffeb3b';
+    if (n <= 40) return '#4caf50';
+    return '#2196f3';
+}
+
+generateBtn.addEventListener('click', generateLottoNumbers);
+
+// --- Animal Test Logic ---
+async function initModel() {
+    if (model) return;
+    try {
+        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+        maxPredictions = model.getTotalClasses();
+    } catch (e) { console.error("Model load failed", e); }
+}
+
 uploadBox.addEventListener('click', () => imageInput.click());
 
-uploadBox.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadBox.style.borderColor = 'var(--primary-color)';
-    uploadBox.style.backgroundColor = '#f1f0ff';
-});
-
-uploadBox.addEventListener('dragleave', () => {
-    uploadBox.style.borderColor = 'var(--accent-color)';
-    uploadBox.style.backgroundColor = '#fdfdff';
-});
-
-uploadBox.addEventListener('drop', (e) => {
-    e.preventDefault();
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleImage(files[0]);
-    }
-});
-
 imageInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        handleImage(e.target.files[0]);
-    }
-});
-
-removeBtn.addEventListener('click', () => {
-    resetUI();
+    if (e.target.files.length > 0) handleImage(e.target.files[0]);
 });
 
 async function handleImage(file) {
-    if (!file.type.startsWith('image/')) {
-        alert('이미지 파일만 업로드 가능합니다.');
-        return;
-    }
-
     const reader = new FileReader();
     reader.onload = async (e) => {
         imagePreview.src = e.target.result;
         uploadBox.style.display = 'none';
         previewContainer.style.display = 'block';
-        
-        // Start prediction
         await predict();
     };
     reader.readAsDataURL(file);
 }
 
 async function predict() {
-    if (!model) {
-        await init();
-    }
-
+    await initModel();
     loading.style.display = 'block';
     resultContainer.style.display = 'none';
 
-    // Wait for image to load to ensure it's ready for prediction
     await new Promise(resolve => {
         if (imagePreview.complete) resolve();
         else imagePreview.onload = resolve;
     });
 
     const prediction = await model.predict(imagePreview);
-    
-    // Sort predictions by probability
     prediction.sort((a, b) => b.probability - a.probability);
-
     renderResults(prediction);
 }
 
@@ -105,40 +133,26 @@ function renderResults(predictions) {
     resultContainer.style.display = 'block';
     labelContainerDiv.innerHTML = '';
 
-    // Label mapping (Class 1 -> 강아지, Class 2 -> 고양이)
     const labelMapping = {
-        "Class 1": "강아지",
-        "Class 2": "고양이",
-        "클래스 1": "강아지",
-        "클래스 2": "고양이",
-        "클래스1": "강아지",
-        "클래스2": "고양이"
+        "Class 1": "강아지", "Class 2": "고양이",
+        "클래스 1": "강아지", "클래스 2": "고양이",
+        "클래스1": "강아지", "클래스2": "고양이"
     };
 
-    // Apply mapping to predictions
-    const mappedPredictions = predictions.map(p => ({
-        ...p,
-        className: labelMapping[p.className] || p.className
+    const mapped = predictions.map(p => ({
+        ...p, className: labelMapping[p.className] || p.className
     }));
 
-    const topResult = mappedPredictions[0];
-    let message = "";
-    
-    if (topResult.className.includes("강아지")) {
-        message = "당신은 귀여운 강아지상! 🐶";
-    } else if (topResult.className.includes("고양이")) {
-        message = "당신은 도도한 고양이상! 🐱";
-    } else {
-        message = `당신은 ${topResult.className}상!`;
-    }
-    
-    resultMessage.innerText = message;
+    const top = mapped[0];
+    resultMessage.innerText = top.className.includes("강아지") ? "당신은 귀여운 강아지상! 🐶" : 
+                             top.className.includes("고양이") ? "당신은 도도한 고양이상! 🐱" : 
+                             `당신은 ${top.className}상!`;
 
-    mappedPredictions.forEach(p => {
+    mapped.forEach(p => {
         const prob = (p.probability * 100).toFixed(1);
-        const resultBar = `
-            <div class="result-bar-container">
-                <span class="label-text">${p.className}</span>
+        labelContainerDiv.innerHTML += `
+            <div class="result-bar">
+                <span style="font-size: 0.9rem; font-weight: bold;">${p.className}</span>
                 <div class="progress-bar-bg">
                     <div class="progress-bar-fill" style="width: ${prob}%">
                         <span class="percent-text">${prob}%</span>
@@ -146,20 +160,15 @@ function renderResults(predictions) {
                 </div>
             </div>
         `;
-        labelContainerDiv.innerHTML += resultBar;
     });
 }
 
-function resetUI() {
+removeBtn.addEventListener('click', () => {
     imageInput.value = '';
-    imagePreview.src = '';
     uploadBox.style.display = 'block';
     previewContainer.style.display = 'none';
     resultContainer.style.display = 'none';
-    loading.style.display = 'none';
-    uploadBox.style.borderColor = 'var(--accent-color)';
-    uploadBox.style.backgroundColor = '#fdfdff';
-}
+});
 
-// Initialize model on load
-init();
+// Initial
+generateLottoNumbers();

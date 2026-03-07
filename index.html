@@ -3,13 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>인공지능 동물상 테스트</title>
+    <title>Multi Service: Lotto & Animal Test</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
+    <div class="theme-toggle-container">
+        <button id="theme-btn">☀️ Light Mode</button>
+        <button id="nav-btn" class="nav-btn">🐶 동물상 테스트로 가기</button>
+    </div>
+
+    <!-- Lotto Section -->
+    <div id="lotto-view" class="container">
+        <h1>Lotto Number Generator</h1>
+        <div id="lotto-numbers" class="lotto-numbers"></div>
+        <button id="generate-btn">Generate Numbers</button>
+
+        <section class="contact-section">
+            <hr>
+            <h3>제휴 문의</h3>
+            <p>로또 번호 생성 서비스 제휴 및 문의사항을 남겨주세요.</p>
+            <form action="https://formspree.io/f/mjgavzjw" method="POST">
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="이메일 주소" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" rows="4" placeholder="문의 내용을 입력해주세요" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">문의 보내기</button>
+            </form>
+        </section>
+
+        <section class="comments-section">
+            <hr>
+            <div id="disqus_thread"></div>
+        </section>
+    </div>
+
+    <!-- Animal Test Section (Hidden by default) -->
+    <div id="animal-view" class="container" style="display: none;">
         <header>
             <h1>인공지능 동물상 테스트</h1>
             <p class="subtitle">나와 닮은 동물은 강아지? 고양이?</p>
@@ -36,20 +68,25 @@
 
             <div id="result-container" class="result-container" style="display: none;">
                 <h2 id="result-message">분석 결과</h2>
-                <div class="result-charts" id="label-container">
-                    <!-- Results will be injected here -->
-                </div>
+                <div class="result-charts" id="label-container"></div>
             </div>
         </main>
-
-        <footer>
-            <p>© 2026 Animal Lookalike Test. Powered by Teachable Machine.</p>
-        </footer>
+        <button id="back-to-lotto" class="back-btn">← 로또 생성기로 돌아가기</button>
     </div>
 
     <!-- Teachable Machine Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
+
+    <script>
+        // Disqus implementation (kept as requested)
+        (function() {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://productbuilder-uio8zjyy3k.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
 </body>
 </html>
