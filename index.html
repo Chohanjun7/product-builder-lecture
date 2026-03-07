@@ -1,59 +1,55 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto Number Generator</title>
+    <title>인공지능 동물상 테스트</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
-<body>2
+<body>
     <div class="container">
-        <div class="theme-toggle">
-            <button id="theme-btn">☀️ Light Mode</button>
-        </div>
-        <h1>Lotto Number Generator</h1>
-        <div id="lotto-numbers" class="lotto-numbers"></div>
-        <button id="generate-btn">Generate Numbers</button>
+        <header>
+            <h1>인공지능 동물상 테스트</h1>
+            <p class="subtitle">나와 닮은 동물은 강아지? 고양이?</p>
+        </header>
 
-        <section class="contact-section">
-            <hr>
-            <h3>제휴 문의</h3>
-            <p>로또 번호 생성 서비스 제휴 및 문의사항을 남겨주세요.</p>
-            <form action="https://formspree.io/f/mjgavzjw" method="POST">
-                <div class="form-group">
-                    <input type="email" name="email" placeholder="이메일 주소" required>
+        <main>
+            <div class="upload-container" id="upload-container">
+                <input type="file" id="image-input" accept="image/*" hidden>
+                <div class="upload-box" id="upload-box">
+                    <div class="upload-icon">📸</div>
+                    <p>사진을 업로드하거나 드래그하세요</p>
+                    <span>(사진은 어디에도 저장되지 않습니다)</span>
                 </div>
-                <div class="form-group">
-                    <textarea name="message" rows="4" placeholder="문의 내용을 입력해주세요" required></textarea>
+                <div class="image-preview-container" id="preview-container" style="display: none;">
+                    <img id="image-preview" src="" alt="Preview">
+                    <button id="remove-btn">다시 하기</button>
                 </div>
-                <button type="submit" class="submit-btn">문의 보내기</button>
-            </form>
-        </section>
+            </div>
 
-        <section class="comments-section">
-            <hr>
-            <div id="disqus_thread"></div>
-            <script>
-                /**
-                *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-                *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-                /*
-                var disqus_config = function () {
-                this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-                this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-                };
-                */
-                (function() { // DON'T EDIT BELOW THIS LINE
-                var d = document, s = d.createElement('script');
-                s.src = 'https://productbuilder-uio8zjyy3k.disqus.com/embed.js';
-                s.setAttribute('data-timestamp', +new Date());
-                (d.head || d.body).appendChild(s);
-                })();
-            </script>
-            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        </section>
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>인공지능이 분석 중입니다...</p>
+            </div>
+
+            <div id="result-container" class="result-container" style="display: none;">
+                <h2 id="result-message">분석 결과</h2>
+                <div class="result-charts" id="label-container">
+                    <!-- Results will be injected here -->
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2026 Animal Lookalike Test. Powered by Teachable Machine.</p>
+        </footer>
     </div>
-    <script type="module" src="main.js"></script>
+
+    <!-- Teachable Machine Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

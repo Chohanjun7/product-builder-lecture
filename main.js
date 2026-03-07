@@ -1,128 +1,150 @@
+// Teachable Machine Model URL
+const URL = "https://teachablemachine.withgoogle.com/models/tM5NC3zbJ/";
 
-class LottoBall extends HTMLElement {
-    static get observedAttributes() {
-        return ['number', 'color'];
-    }
+let model, labelContainer, maxPredictions;
 
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-    }
+// Load the image model
+async function init() {
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
 
-    connectedCallback() {
-        this.render();
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue !== newValue && this.shadowRoot) {
-            this.render();
-        }
-    }
-
-    render() {
-        const number = this.getAttribute('number') || '';
-        const color = this.getAttribute('color') || '#333';
-
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host {
-                    display: inline-block;
-                }
-                .ball {
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                    color: var(--ball-text-color, #ffffff);
-                    background-color: ${color};
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2);
-                    animation: appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-                    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-                }
-
-                @keyframes appear {
-                    from {
-                        transform: scale(0) rotate(-180deg);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: scale(1) rotate(0deg);
-                        opacity: 1;
-                    }
-                }
-            </style>
-            <div class="ball">${number}</div>
-        `;
+    try {
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+        console.log("Model loaded successfully");
+    } catch (e) {
+        console.error("Failed to load model", e);
     }
 }
-
-customElements.define('lotto-ball', LottoBall);
 
 // DOM Elements
-const generateBtn = document.getElementById('generate-btn');
-const lottoNumbersContainer = document.getElementById('lotto-numbers');
-const themeBtn = document.getElementById('theme-btn');
+const imageInput = document.getElementById('image-input');
+const uploadBox = document.getElementById('upload-box');
+const previewContainer = document.getElementById('preview-container');
+const imagePreview = document.getElementById('image-preview');
+const removeBtn = document.getElementById('remove-btn');
+const loading = document.getElementById('loading');
+const resultContainer = document.getElementById('result-container');
+const labelContainerDiv = document.getElementById('label-container');
+const resultMessage = document.getElementById('result-message');
 
-// Theme Logic
-let currentTheme = localStorage.getItem('theme') || 'dark';
-document.documentElement.setAttribute('data-theme', currentTheme);
-updateThemeButton();
+// Event Listeners
+uploadBox.addEventListener('click', () => imageInput.click());
 
-themeBtn.addEventListener('click', () => {
-    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    localStorage.setItem('theme', currentTheme);
-    updateThemeButton();
+uploadBox.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadBox.style.borderColor = 'var(--primary-color)';
+    uploadBox.style.backgroundColor = '#f1f0ff';
 });
 
-function updateThemeButton() {
-    themeBtn.textContent = currentTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-}
+uploadBox.addEventListener('dragleave', () => {
+    uploadBox.style.borderColor = 'var(--accent-color)';
+    uploadBox.style.backgroundColor = '#fdfdff';
+});
 
-// Lotto Generation Logic
-function generateLottoNumbers() {
-    lottoNumbersContainer.innerHTML = '';
-    const numbers = new Set();
-    while (numbers.size < 6) {
-        const randomNumber = Math.floor(Math.random() * 45) + 1;
-        numbers.add(randomNumber);
+uploadBox.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleImage(files[0]);
+    }
+});
+
+imageInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        handleImage(e.target.files[0]);
+    }
+});
+
+removeBtn.addEventListener('click', () => {
+    resetUI();
+});
+
+async function handleImage(file) {
+    if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.');
+        return;
     }
 
-    const sortedNumbers = Array.from(numbers).sort((a, b) => a - b);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        imagePreview.src = e.target.result;
+        uploadBox.style.display = 'none';
+        previewContainer.style.display = 'block';
+        
+        // Start prediction
+        await predict();
+    };
+    reader.readAsDataURL(file);
+}
 
-    sortedNumbers.forEach((number, index) => {
-        setTimeout(() => {
-            const lottoBall = document.createElement('lotto-ball');
-            const bgColor = getBallColor(number);
-            
-            lottoBall.setAttribute('number', number);
-            lottoBall.setAttribute('color', bgColor);
-            
-            // 번호별 가독성을 위한 글자색 설정
-            if (number > 20 && number <= 30) {
-                lottoBall.style.setProperty('--ball-text-color', '#000000');
-            } else {
-                lottoBall.style.setProperty('--ball-text-color', '#ffffff');
-            }
-            
-            lottoNumbersContainer.appendChild(lottoBall);
-        }, index * 150);
+async function predict() {
+    if (!model) {
+        await init();
+    }
+
+    loading.style.display = 'block';
+    resultContainer.style.display = 'none';
+
+    // Wait for image to load to ensure it's ready for prediction
+    await new Promise(resolve => {
+        if (imagePreview.complete) resolve();
+        else imagePreview.onload = resolve;
+    });
+
+    const prediction = await model.predict(imagePreview);
+    
+    // Sort predictions by probability
+    prediction.sort((a, b) => b.probability - a.probability);
+
+    renderResults(prediction);
+}
+
+function renderResults(predictions) {
+    loading.style.display = 'none';
+    resultContainer.style.display = 'block';
+    labelContainerDiv.innerHTML = '';
+
+    const topResult = predictions[0];
+    let message = "";
+    
+    // Custom messages based on top result (assuming labels like "강아지", "고양이")
+    if (topResult.className.includes("강아지") || topResult.className.toLowerCase().includes("dog")) {
+        message = "당신은 귀여운 강아지상! 🐶";
+    } else if (topResult.className.includes("고양이") || topResult.className.toLowerCase().includes("cat")) {
+        message = "당신은 도도한 고양이상! 🐱";
+    } else {
+        message = `당신은 ${topResult.className}상!`;
+    }
+    
+    resultMessage.innerText = message;
+
+    predictions.forEach(p => {
+        const prob = (p.probability * 100).toFixed(1);
+        const resultBar = `
+            <div class="result-bar-container">
+                <span class="label-text">${p.className}</span>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: ${prob}%">
+                        <span class="percent-text">${prob}%</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        labelContainerDiv.innerHTML += resultBar;
     });
 }
 
-function getBallColor(number) {
-    if (number <= 10) return '#f44336'; // Red
-    if (number <= 20) return '#ff9800'; // Orange
-    if (number <= 30) return '#ffeb3b'; // Yellow
-    if (number <= 40) return '#4caf50'; // Green
-    return '#2196f3'; // Blue
+function resetUI() {
+    imageInput.value = '';
+    imagePreview.src = '';
+    uploadBox.style.display = 'block';
+    previewContainer.style.display = 'none';
+    resultContainer.style.display = 'none';
+    loading.style.display = 'none';
+    uploadBox.style.borderColor = 'var(--accent-color)';
+    uploadBox.style.backgroundColor = '#fdfdff';
 }
 
-generateBtn.addEventListener('click', generateLottoNumbers);
-
-// Initial generation
-generateLottoNumbers();
+// Initialize model on load
+init();

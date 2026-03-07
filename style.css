@@ -1,187 +1,196 @@
-
 :root {
-    /* 기본값: 다크 모드 */
-    --background-color: #121212;
-    --text-color: #ffffff;
-    --primary-color: #4caf50;
-    --secondary-color: #ff9800;
-    --container-bg: rgba(255, 255, 255, 0.05);
-    --shadow-color: rgba(0, 0, 0, 0.5);
-    --dot-color: rgba(255, 255, 255, 0.1);
+    --primary-color: #6c5ce7;
+    --bg-color: #f9f9f9;
+    --text-color: #2d3436;
+    --accent-color: #a29bfe;
+    --white: #ffffff;
+    --gray: #b2bec3;
+    --success: #00b894;
 }
 
-[data-theme="light"] {
-    --background-color: #f5f5f5;
-    --text-color: #121212;
-    --primary-color: #2e7d32;
-    --secondary-color: #ef6c00;
-    --container-bg: rgba(255, 255, 255, 0.8);
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --dot-color: rgba(0, 0, 0, 0.05);
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--background-color);
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-color);
     color: var(--text-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    background-image: radial-gradient(circle at 1px 1px, var(--dot-color) 1px, transparent 0);
-    background-size: 20px 20px;
+    line-height: 1.6;
 }
 
 .container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     text-align: center;
-    padding: 2.5rem;
-    background-color: var(--container-bg);
-    border-radius: 20px;
-    box-shadow: 0 10px 40px var(--shadow-color);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--dot-color);
-    max-width: 500px;
-    width: 90%;
 }
 
-.theme-toggle {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
-}
-
-#theme-btn {
-    background: none;
-    border: 1px solid var(--text-color);
-    color: var(--text-color);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-#theme-btn:hover {
-    background-color: var(--text-color);
-    color: var(--background-color);
-}
-
-h1 {
-    font-size: 2.2rem;
-    color: var(--primary-color);
-    margin-bottom: 2rem;
-    transition: color 0.3s ease;
-}
-
-.lotto-numbers {
-    display: flex;
-    justify-content: center;
-    gap: 0.8rem;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
-    min-height: 70px; /* 공이 없을 때 레이아웃 유지 */
-}
-
-#generate-btn {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    border: none;
-    padding: 1.2rem 2.5rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px var(--shadow-color);
-}
-
-#generate-btn:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--shadow-color);
-}
-
-#generate-btn:active {
-    transform: translateY(0);
-}
-
-.contact-section {
-    margin-top: 3rem;
-    padding-top: 1rem;
-    text-align: left;
-}
-
-.contact-section hr {
-    border: none;
-    border-top: 1px solid var(--dot-color);
-    margin-bottom: 2rem;
-}
-
-.contact-section h3 {
+header h1 {
+    font-size: 2rem;
     color: var(--primary-color);
     margin-bottom: 0.5rem;
 }
 
-.contact-section p {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-bottom: 1.5rem;
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--gray);
+    margin-bottom: 2.5rem;
 }
 
-.form-group {
-    margin-bottom: 1rem;
+/* Upload Styles */
+.upload-container {
+    margin-bottom: 2rem;
 }
 
-input[type="email"],
-textarea {
-    width: 100%;
-    padding: 0.8rem;
-    border-radius: 8px;
-    border: 1px solid var(--dot-color);
-    background-color: var(--container-bg);
-    color: var(--text-color);
-    font-family: inherit;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
+.upload-box {
+    border: 3px dashed var(--accent-color);
+    border-radius: 20px;
+    padding: 3rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #fdfdff;
 }
 
-input[type="email"]:focus,
-textarea:focus {
-    outline: none;
+.upload-box:hover {
+    background-color: #f1f0ff;
     border-color: var(--primary-color);
 }
 
-.submit-btn {
-    width: 100%;
-    padding: 0.8rem;
-    background-color: transparent;
-    border: 1px solid var(--primary-color);
+.upload-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.upload-box p {
+    font-size: 1.2rem;
+    font-weight: 700;
     color: var(--primary-color);
-    border-radius: 8px;
+}
+
+.upload-box span {
+    font-size: 0.85rem;
+    color: var(--gray);
+}
+
+.image-preview-container {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+#image-preview {
+    max-width: 100%;
+    max-height: 400px;
+    display: block;
+    margin: 0 auto;
+    border-radius: 15px;
+}
+
+#remove-btn {
+    margin-top: 1rem;
+    background: var(--gray);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.3s ease;
+    transition: 0.3s;
 }
 
-.submit-btn:hover {
-    background-color: var(--primary-color);
-    color: #ffffff;
+#remove-btn:hover {
+    background: var(--text-color);
 }
 
-@media (max-width: 600px) {
+/* Results Styles */
+.result-container {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: #fdfdff;
+    border-radius: 15px;
+    border: 1px solid #e0e0ff;
+}
+
+#result-message {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.result-bar-container {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.label-text {
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.progress-bar-bg {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    height: 25px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease-out;
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+}
+
+.percent-text {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* Loading Animation */
+.loading {
+    margin: 2rem 0;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(108, 92, 231, 0.2);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+footer {
+    margin-top: 3rem;
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+@media (max-width: 480px) {
     .container {
+        margin: 1rem;
         padding: 1.5rem;
     }
-    h1 {
-        font-size: 1.8rem;
-    }
-    .lotto-numbers {
-        gap: 0.5rem;
-    }
-    #generate-btn {
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
+    
+    header h1 {
+        font-size: 1.5rem;
     }
 }
